@@ -89,7 +89,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxss1 libnss3 fonts-noto fonts-noto-cjk fonts-noto-extra text-rendering
+          sudo apt-get install -y libxss1 libnss3 fonts-noto fonts-noto-cjk fonts-noto-extra
           pip install rembg[cli] --break-system-packages
 
       - name: Process Subject 1
@@ -135,3 +135,13 @@ jobs:
           name: professional-output
           path: output.png
           retention-days: 7
+
+      - name: Send to Telegram
+        if: ${{ secrets.TELEGRAM_ID != '' && secrets.CHAT_ID != '' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_ID }}
+          TELEGRAM_CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
+            -F chat_id="${TELEGRAM_CHAT_ID}" \
+            -F photo="@output.png"

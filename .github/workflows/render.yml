@@ -99,8 +99,17 @@ jobs:
           S1_URL="${S1_URL%)}"
           S1_URL="${S1_URL%% }"
           echo "Downloading subject 1 from: $S1_URL"
-          curl -s -L "$S1_URL" -o s1_raw.jpg
+          curl -fSL -H "User-Agent: Mozilla/5.0" -H "Accept: image/*,*/*" "$S1_URL" -o s1_raw.jpg
+          echo "Downloaded file type:"
           file s1_raw.jpg
+          head -c 100 s1_raw.jpg | xxd | head -3
+          if file s1_raw.jpg | grep -qiE "image|JPEG|PNG|bitmap"; then
+            echo "Valid image detected"
+          else
+            echo "ERROR: Downloaded file is NOT a valid image. Content:"
+            head -c 500 s1_raw.jpg
+            exit 1
+          fi
           if [[ "${{ inputs.subject_1_mode }}" == *"cutout"* ]]; then
             rembg i s1_raw.jpg s1_final.png
           else
@@ -114,8 +123,16 @@ jobs:
           S2_URL="${S2_URL%)}"
           S2_URL="${S2_URL%% }"
           echo "Downloading subject 2 from: $S2_URL"
-          curl -s -L "$S2_URL" -o s2_raw.jpg
+          curl -fSL -H "User-Agent: Mozilla/5.0" -H "Accept: image/*,*/*" "$S2_URL" -o s2_raw.jpg
+          echo "Downloaded file type:"
           file s2_raw.jpg
+          if file s2_raw.jpg | grep -qiE "image|JPEG|PNG|bitmap"; then
+            echo "Valid image detected"
+          else
+            echo "ERROR: Downloaded file is NOT a valid image. Content:"
+            head -c 500 s2_raw.jpg
+            exit 1
+          fi
           if [[ "${{ inputs.subject_2_mode }}" == *"cutout"* ]]; then
             rembg i s2_raw.jpg s2_final.png
           else

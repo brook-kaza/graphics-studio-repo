@@ -90,7 +90,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libxss1 libnss3 fonts-noto fonts-noto-cjk fonts-noto-extra libgl1 libglib2.0-0
-          pip install rembg[cli] --break-system-packages
+          pip install "rembg[cpu]" --break-system-packages
 
       - name: Process Subject 1
         if: ${{ inputs.subject_1_url != '' && inputs.subject_1_mode != 'none' }}

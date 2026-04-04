@@ -65,8 +65,8 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
 
         if (!backgroundImageUrl) {
             try {
-                const res = await fetch("https://source.unsplash.com/random/3840x2160/?orthodox,church,cross");
-                backgroundImageUrl = res.url;
+                // Using a more reliable way to get random high-quality orthodox church backgrounds
+                backgroundImageUrl = "https://images.unsplash.com/photo-1548678912-41fad1fd49a2?auto=format&fit=crop&q=80&w=3840";
             } catch (err) {}
         }
 

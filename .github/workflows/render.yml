@@ -137,7 +137,6 @@ jobs:
           retention-days: 7
 
       - name: Send to Telegram
-        if: ${{ secrets.TELEGRAM_ID != '' && secrets.CHAT_ID != '' }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_ID }}
           TELEGRAM_CHAT_ID: ${{ secrets.CHAT_ID }}

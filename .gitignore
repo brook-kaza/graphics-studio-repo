@@ -1,0 +1,8 @@
+node_modules/
+output.png
+s1_raw.jpg
+s1_final.png
+s2_raw.jpg
+s2_final.png
+.env
+.DS_Store

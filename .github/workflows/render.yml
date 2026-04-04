@@ -1,0 +1,137 @@
+name: Professional Studio Engine
+
+on:
+  workflow_dispatch:
+    inputs:
+      template_type:
+        description: 'Design Template'
+        required: true
+        type: choice
+        options: [ad, announcement, event]
+        default: 'ad'
+      aspect_ratio:
+        description: 'Aspect Ratio'
+        required: true
+        type: choice
+        options: ["16:9", "4:5", "9:16"]
+        default: '16:9'
+      title:
+        description: 'Main Heading'
+        required: true
+        type: string
+        default: 'የሰንበት ትምህርት ቤት ጉባኤ'
+      sub_title:
+        description: 'Sub Heading'
+        required: false
+        type: string
+        default: 'ልዩ መርሐግብር'
+      details:
+        description: 'Details / Location'
+        required: true
+        type: string
+        default: 'በመካነ ሕያዋን አቡነ ገብረ መንፈስ ቅዱስ ቤተ ክርስቲያን'
+      call_to_action:
+        description: 'Call to Action / Time'
+        required: true
+        type: string
+        default: 'ኑ! እንማር!'
+      background_image_url:
+        description: 'Background Vector/Environment URL'
+        required: false
+        type: string
+        default: ''
+      focal_point:
+        description: 'Background focal point'
+        required: true
+        type: choice
+        options: [center, top, bottom, left, right]
+        default: 'center'
+      subject_1_url:
+        description: 'Subject 1 Image URL'
+        required: false
+        type: string
+        default: ''
+      subject_1_mode:
+        description: 'Subject 1 Styling Matrix'
+        required: true
+        type: choice
+        options: [none, cutout-left, cutout-right, frame-left, frame-right, frame-center]
+        default: 'none'
+      subject_2_url:
+        description: 'Subject 2 Image URL'
+        required: false
+        type: string
+        default: ''
+      subject_2_mode:
+        description: 'Subject 2 Styling Matrix'
+        required: true
+        type: choice
+        options: [none, cutout-left, cutout-right, frame-left, frame-right, frame-center]
+        default: 'none'
+      logo_url:
+        description: 'Optional Watermark'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  generate-graphic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node & Py
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxss1 libnss3 fonts-noto fonts-noto-cjk fonts-noto-extra text-rendering
+          pip install rembg[cli] --break-system-packages
+
+      - name: Process Subject 1
+        if: ${{ inputs.subject_1_url != '' && inputs.subject_1_mode != 'none' }}
+        run: |
+          curl -s -L "${{ inputs.subject_1_url }}" -o s1_raw.jpg
+          if [[ "${{ inputs.subject_1_mode }}" == *"cutout"* ]]; then
+            rembg i s1_raw.jpg s1_final.png
+          else
+            mv s1_raw.jpg s1_final.png
+          fi
+
+      - name: Process Subject 2
+        if: ${{ inputs.subject_2_url != '' && inputs.subject_2_mode != 'none' }}
+        run: |
+          curl -s -L "${{ inputs.subject_2_url }}" -o s2_raw.jpg
+          if [[ "${{ inputs.subject_2_mode }}" == *"cutout"* ]]; then
+            rembg i s2_raw.jpg s2_final.png
+          else
+            mv s2_raw.jpg s2_final.png
+          fi
+
+      - name: Run Engine
+        env:
+          TEMPLATE_TYPE: ${{ inputs.template_type }}
+          ASPECT_RATIO: ${{ inputs.aspect_ratio }}
+          TITLE: ${{ inputs.title }}
+          SUB_TITLE: ${{ inputs.sub_title }}
+          DETAILS: ${{ inputs.details }}
+          CALL_TO_ACTION: ${{ inputs.call_to_action }}
+          BACKGROUND_IMAGE_URL: ${{ inputs.background_image_url }}
+          FOCAL_POINT: ${{ inputs.focal_point }}
+          SUBJECT_1_MODE: ${{ inputs.subject_1_mode }}
+          SUBJECT_2_MODE: ${{ inputs.subject_2_mode }}
+          LOGO_URL: ${{ inputs.logo_url }}
+        run: |
+          npm install
+          npm start
+
+      - name: Upload Output PNG
+        uses: actions/upload-artifact@v4
+        with:
+          name: professional-output
+          path: output.png
+          retention-days: 7

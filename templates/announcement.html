@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="am" class="w-full h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EOTC Official Announcement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --seal-blue: #002244;
+            --seal-gold: #C5A059;
+            --parchment: #FDFBF7;
+        }
+        body {
+            font-family: 'Noto Sans Ethiopic', sans-serif; margin: 0; padding: 0;
+            width: 100vw; height: 100vh; overflow: hidden; background-color: var(--seal-blue);
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .blur-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0, 34, 68, 0.75); backdrop-filter: blur(40px) saturate(120%); 
+            z-index: 20;
+        }
+
+        .official-card {
+            position: relative; z-index: 30; width: 75%; height: 85%;
+            background-color: var(--parchment);
+            background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noise)" opacity="0.04"/%3E%3C/svg%3E');
+            border-radius: 12px;
+            box-shadow: 0 50px 150px rgba(0,0,0,0.8), inset 0 0 50px rgba(197, 160, 89, 0.1);
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            padding: 8% 10%; text-align: center;
+        }
+
+        .card-outer-border {
+            position: absolute; top: 1.5%; left: 1.5%; right: 1.5%; bottom: 1.5%;
+            border: 4px solid var(--seal-blue); pointer-events: none; border-radius: 8px; opacity: 0.9;
+        }
+        .card-inner-border {
+            position: absolute; top: 3%; left: 3%; right: 3%; bottom: 3%;
+            border: 1px solid var(--seal-gold); pointer-events: none; border-radius: 4px;
+        }
+
+        .seal-divider {
+            width: 100%; display: flex; align-items: center; justify-content: center; margin: 4vh 0;
+        }
+        .seal-divider::before, .seal-divider::after {
+            content:''; flex-grow: 1; height: 1px; background: var(--seal-gold); opacity: 0.5;
+        }
+        .seal-divider span { margin: 0 3vh; color: var(--seal-gold); font-size: 3vh; }
+
+        .subtitle-box {
+            font-size: 2.8vh; color: var(--seal-blue); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.4vw; opacity: 0.7;
+        }
+
+        .title-box {
+            font-size: 8vh; font-weight: 900; color: var(--seal-blue);
+            line-height: 1.25; margin-bottom: 2vh; text-wrap: balance;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .details-wrapper {
+            flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%;
+        }
+
+        .details-box {
+            font-size: 4.5vh; font-weight: 400; color: #222; line-height: 1.8; text-wrap: balance;
+        }
+
+        .cta-box {
+            margin-top: 6vh; padding: 1vh 3vh; border: 2px solid var(--seal-gold);
+            font-size: 3.5vh; font-weight: 700; color: var(--seal-blue); text-transform: uppercase;
+        }
+
+        .ec-date-box {
+            position: absolute; bottom: 5%; font-size: 2.5vh; color: var(--seal-blue); opacity: 0.8; font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <!-- BACKGROUND_LAYER -->
+    <div class="blur-overlay"></div>
+    
+    <!-- SUBJECT_LAYER -->
+
+    <!-- WATERMARK_LAYER -->
+
+    <div class="official-card">
+        <div class="card-outer-border"></div>
+        <div class="card-inner-border"></div>
+        
+        <div class="subtitle-box"><!-- SUB_TITLE --></div>
+        <div class="seal-divider"><span>◈</span></div>
+        <h1 class="title-box"><!-- TITLE --></h1>
+        
+        <div class="details-wrapper">
+            <p class="details-box"><!-- DETAILS --></p>
+            <div class="cta-box"><!-- CALL_TO_ACTION --></div>
+        </div>
+        
+        <div class="ec-date-box"><!-- EC_DATE --></div>
+    </div>
+</body>
+</html>

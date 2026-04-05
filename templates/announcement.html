@@ -18,6 +18,12 @@
             display: flex; justify-content: center; align-items: center;
         }
 
+        .bg-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 1;
+            /* FOCAL_POINT_PLACEHOLDER */
+        }
+
         .blur-overlay {
             position: absolute; top:0; left:0; width:100%; height:100%;
             background: rgba(0, 34, 68, 0.75); backdrop-filter: blur(40px) saturate(120%); 

@@ -18,6 +18,12 @@
             display: flex; justify-content: center; align-items: center;
         }
 
+        .bg-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 1;
+            /* FOCAL_POINT_PLACEHOLDER */
+        }
+
         /* Abstract volumetric particles rendering via pure CSS */
         .particles {
             position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none;

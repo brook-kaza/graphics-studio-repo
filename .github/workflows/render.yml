@@ -145,13 +145,22 @@ jobs:
           BG_URL="${{ inputs.background_image_url }}"
           BG_URL="${BG_URL%)}"
           BG_URL="${BG_URL%% }"
-          echo "Downloading background from: $BG_URL"
-          curl -fSL -H "User-Agent: Mozilla/5.0" -H "Accept: image/*,*/*" "$BG_URL" -o bg_raw.jpg
+          
+          if [[ "$BG_URL" == data:* ]]; then
+            echo "Base64 background detected, decoding..."
+            # Extract the base64 part after the comma
+            BASE64_DATA=$(echo "$BG_URL" | cut -d',' -f2)
+            echo "$BASE64_DATA" | base64 -d > bg_raw.jpg
+          else
+            echo "Downloading background from: $BG_URL"
+            curl -fSL -H "User-Agent: Mozilla/5.0" -H "Accept: image/*,*/*" "$BG_URL" -o bg_raw.jpg
+          fi
+          
           file bg_raw.jpg
-          if file bg_raw.jpg | grep -qiE "image|JPEG|PNG|bitmap"; then
+          if file bg_raw.jpg | grep -qiE "image|JPEG|PNG|bitmap|data"; then
             echo "Valid background detected"
           else
-            echo "ERROR: Background download failed or is not an image."
+            echo "ERROR: Background processing failed."
             exit 1
           fi
 

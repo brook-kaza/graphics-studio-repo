@@ -139,6 +139,22 @@ jobs:
             mv s2_raw.jpg s2_final.png
           fi
 
+      - name: Process Background
+        if: ${{ inputs.background_image_url != '' }}
+        run: |
+          BG_URL="${{ inputs.background_image_url }}"
+          BG_URL="${BG_URL%)}"
+          BG_URL="${BG_URL%% }"
+          echo "Downloading background from: $BG_URL"
+          curl -fSL -H "User-Agent: Mozilla/5.0" -H "Accept: image/*,*/*" "$BG_URL" -o bg_raw.jpg
+          file bg_raw.jpg
+          if file bg_raw.jpg | grep -qiE "image|JPEG|PNG|bitmap"; then
+            echo "Valid background detected"
+          else
+            echo "ERROR: Background download failed or is not an image."
+            exit 1
+          fi
+
       - name: Run Engine
         env:
           TEMPLATE_TYPE: ${{ inputs.template_type }}
@@ -148,6 +164,7 @@ jobs:
           DETAILS: ${{ inputs.details }}
           CALL_TO_ACTION: ${{ inputs.call_to_action }}
           BACKGROUND_IMAGE_URL: ${{ inputs.background_image_url }}
+          BACKGROUND_LOCAL_PATH: "bg_raw.jpg"
           FOCAL_POINT: ${{ inputs.focal_point }}
           SUBJECT_1_MODE: ${{ inputs.subject_1_mode }}
           SUBJECT_2_MODE: ${{ inputs.subject_2_mode }}
@@ -169,12 +186,13 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
           sudo apt-get install -y imagemagick
-          convert output.png -quality 85 -resize '1920x1920>' output_tg.jpg
+          # High-quality JPEG conversion for Telegram (max 10MB)
+          convert output.png -filter Lanczos -quality 95 -resize '2560x2560>' output_tg.jpg
           FILE_SIZE=$(stat -c%s output_tg.jpg)
           echo "Telegram file size: $FILE_SIZE bytes"
           if [ "$FILE_SIZE" -gt 10485760 ]; then
-            convert output.png -quality 70 -resize '1280x1280>' output_tg.jpg
-            echo "Re-compressed to $(stat -c%s output_tg.jpg) bytes"
+            echo "File too big, reducing quality..."
+            convert output.png -quality 85 -resize '1920x1920>' output_tg.jpg
           fi
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
             -F chat_id="${TELEGRAM_CHAT_ID}" \

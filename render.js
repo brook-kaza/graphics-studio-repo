@@ -56,6 +56,7 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
         const focalPoint = (process.env.FOCAL_POINT || "center").trim();
         const logoUrl = (process.env.LOGO_URL || "").trim();
 
+        const backgroundLocalPath = (process.env.BACKGROUND_LOCAL_PATH || "").trim();
         const s1Mode = (process.env.SUBJECT_1_MODE || "none").trim();
         const s2Mode = (process.env.SUBJECT_2_MODE || "none").trim();
         
@@ -63,7 +64,11 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
         const subject2Html = buildSubjectHtml(path.join(__dirname, 's2_final.png'), s2Mode, 46);
         const multiSubjectHtml = subject1Html + '\n' + subject2Html;
 
-        if (!backgroundImageUrl) {
+        if (fs.existsSync(backgroundLocalPath)) {
+            const b64Data = fs.readFileSync(backgroundLocalPath).toString('base64');
+            const ext = backgroundLocalPath.endsWith('.png') ? 'png' : 'jpeg';
+            backgroundImageUrl = `data:image/${ext};base64,${b64Data}`;
+        } else if (!backgroundImageUrl) {
             try {
                 // Using a more reliable way to get random high-quality orthodox church backgrounds
                 backgroundImageUrl = "https://images.unsplash.com/photo-1548678912-41fad1fd49a2?auto=format&fit=crop&q=80&w=3840";

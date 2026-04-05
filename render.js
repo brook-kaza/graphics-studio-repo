@@ -115,7 +115,7 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
         if (aspectRatio === "4:5") { vWidth = 2160; vHeight = 2700; }
         else if (aspectRatio === "9:16") { vWidth = 2160; vHeight = 3840; }
 
-        await page.setViewport({ width: vWidth, height: vHeight, deviceScaleFactor: 2 });
+        await page.setViewport({ width: vWidth, height: vHeight, deviceScaleFactor: 1 });
         await page.setContent(htmlContent, { waitUntil: ['networkidle0', 'load'] });
         await page.evaluate(async () => await document.fonts.ready);
         
@@ -185,7 +185,7 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
             }
         });
 
-        await new Promise(r => setTimeout(r, 2500));
+        await new Promise(r => setTimeout(r, 3500));
 
         await page.screenshot({ path: path.join(__dirname, `output.png`), type: 'png', omitBackground: true });
         await browser.close();

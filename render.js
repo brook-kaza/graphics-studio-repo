@@ -80,8 +80,10 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
           <filter id="cinematic-grain"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.1 0"/></filter>
         </svg>
         <div style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; mix-blend-mode: overlay; filter:url(#cinematic-grain);"></div>
-        <div style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9998; box-shadow: inset 0 0 180px rgba(0,0,0,0.85);"></div>
+        <div style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9998; box-shadow: inset 0 0 250px rgba(0,0,0,0.6);"></div>
         `;
+
+        console.log(`[ENGINE]: Background Image URL is: ${backgroundImageUrl}`);
 
         const backgroundHtml = backgroundImageUrl ? `<img src="${backgroundImageUrl}" class="bg-layer" alt="Background">` : '';
         const watermarkHtml = logoUrl ? `<img src="${logoUrl}" class="watermark" style="position:absolute; top:4%; left:50%; transform:translateX(-50%); z-index:50; height:12%; opacity:0.8; mix-blend-mode:screen; transition: all 0.5s ease;" alt="Watermark">` : '';
@@ -113,11 +115,25 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
         await page.evaluate(async () => await document.fonts.ready);
         
         // Execute Visionary Physics Physics Post-Load
-        await page.evaluate(() => {
-            // 1. Color Extraction Matrix
+        await page.evaluate(async () => {
+            // 1. Image Load & Color Extraction Matrix
             try {
                 const bgImg = document.querySelector('.bg-layer');
                 if (bgImg) {
+                    const checkLoad = () => {
+                        if (bgImg.complete && bgImg.naturalWidth !== 0) return Promise.resolve();
+                        return new Promise((resolve, reject) => {
+                            bgImg.onload = resolve;
+                            bgImg.onerror = () => {
+                                console.error("[BROWSER]: Background image failed to load - URL: " + bgImg.src);
+                                resolve(); // Proceed without failing the whole process
+                            };
+                            setTimeout(resolve, 5000); // Max wait for image
+                        });
+                    };
+                    
+                    await checkLoad();
+                    
                     const cvs = document.createElement('canvas');
                     const ctx = cvs.getContext('2d');
                     cvs.width = 64; cvs.height = 64;
@@ -132,7 +148,9 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
                     document.documentElement.style.setProperty('--seal-blue', `rgb(${Math.max(r-30,0)}, ${Math.max(g-30,0)}, ${Math.max(b-10,0)})`);
                     document.documentElement.style.setProperty('--deep-blue', `rgb(${Math.max(r-40,0)}, ${Math.max(g-40,0)}, ${Math.max(b-20,0)})`);
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error("[BROWSER]: Error in color extraction: " + e.message);
+            }
 
             // 2. Headless Auto-Bounding Text Physics
             // 2. Headless Auto-Bounding Text Physics

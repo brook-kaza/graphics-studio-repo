@@ -132,15 +132,23 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
             } catch(e) {}
 
             // 2. Headless Auto-Bounding Text Physics
-            const shrink = (el) => {
+            // 2. Headless Auto-Bounding Text Physics
+            const shrink = (el, minSize = 24) => {
                 if(!el) return;
                 let size = parseFloat(window.getComputedStyle(el).fontSize);
-                while((el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth) && size > 15) {
+                const originalSize = size;
+                
+                // Only shrink if width overflows or if it's a constrained-height element
+                // We use a safe margin for scrollWidth
+                while((el.scrollWidth > el.clientWidth + 2) && size > minSize) {
                     size -= 1;
                     el.style.fontSize = size + 'px';
                 }
+                if (size !== originalSize) console.log(`Shrunk ${el.className} from ${originalSize}px to ${size}px`);
             };
-            document.querySelectorAll('.title-box, .subtitle-box, .details-box, .details, .cta-box').forEach(el => shrink(el));
+            document.querySelectorAll('.subtitle-box, .cta-box').forEach(el => shrink(el, 20));
+            document.querySelectorAll('.title-box').forEach(el => shrink(el, 40));
+            document.querySelectorAll('.details-box, .details').forEach(el => shrink(el, 18));
 
             // 3. Watermark Collision Avoidance
             const wm = document.querySelector('.watermark');

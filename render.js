@@ -101,6 +101,9 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
         const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
         const page = await browser.newPage();
         
+        // Forward page logs to terminal for debugging
+        page.on('console', msg => console.log(`[BROWSER]: ${msg.text()}`));
+
         let vWidth = 3840; let vHeight = 2160;
         if (aspectRatio === "4:5") { vWidth = 2160; vHeight = 2700; }
         else if (aspectRatio === "9:16") { vWidth = 2160; vHeight = 3840; }

@@ -99,14 +99,18 @@ jobs:
           S1_URL="${S1_URL%)}"
           S1_URL="${S1_URL%% }"
           echo "Downloading subject 1 from: $S1_URL"
-          curl -fSL -H "User-Agent: Mozilla/5.0" -H "Accept: image/*,*/*" "$S1_URL" -o s1_raw.jpg
+          curl -fSL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
+               -H "Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" \
+               -H "Referer: https://pngtree.com/" \
+               --compressed "$S1_URL" -o s1_raw.jpg
+          
           echo "Downloaded file type:"
           file s1_raw.jpg
-          head -c 100 s1_raw.jpg | xxd | head -3
-          if file s1_raw.jpg | grep -qiE "image|JPEG|PNG|bitmap"; then
+          if file s1_raw.jpg | grep -qiE "image|JPEG|PNG|bitmap|data"; then
             echo "Valid image detected"
           else
-            echo "ERROR: Downloaded file is NOT a valid image. Content:"
+            echo "ERROR: Downloaded file is NOT a valid image. Likely blocked by host (403 Forbidden)."
+            echo "Suggestion: Try uploading the image elsewhere or provide as Base64."
             head -c 500 s1_raw.jpg
             exit 1
           fi
@@ -123,13 +127,18 @@ jobs:
           S2_URL="${S2_URL%)}"
           S2_URL="${S2_URL%% }"
           echo "Downloading subject 2 from: $S2_URL"
-          curl -fSL -H "User-Agent: Mozilla/5.0" -H "Accept: image/*,*/*" "$S2_URL" -o s2_raw.jpg
+          curl -fSL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
+               -H "Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" \
+               -H "Referer: https://pngtree.com/" \
+               --compressed "$S2_URL" -o s2_raw.jpg
+          
           echo "Downloaded file type:"
           file s2_raw.jpg
-          if file s2_raw.jpg | grep -qiE "image|JPEG|PNG|bitmap"; then
+          if file s2_raw.jpg | grep -qiE "image|JPEG|PNG|bitmap|data"; then
             echo "Valid image detected"
           else
-            echo "ERROR: Downloaded file is NOT a valid image. Content:"
+            echo "ERROR: Downloaded file is NOT a valid image. Likely blocked by host (403 Forbidden)."
+            echo "Suggestion: Try uploading the image elsewhere or provide as Base64."
             head -c 500 s2_raw.jpg
             exit 1
           fi
@@ -153,14 +162,19 @@ jobs:
             echo "$BASE64_DATA" | base64 -d > bg_raw.jpg
           else
             echo "Downloading background from: $BG_URL"
-            curl -fSL -H "User-Agent: Mozilla/5.0" -H "Accept: image/*,*/*" "$BG_URL" -o bg_raw.jpg
+            curl -fSL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
+                 -H "Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" \
+                 -H "Referer: https://pngtree.com/" \
+                 --compressed "$BG_URL" -o bg_raw.jpg
           fi
           
           file bg_raw.jpg
           if file bg_raw.jpg | grep -qiE "image|JPEG|PNG|bitmap|data"; then
             echo "Valid background detected"
           else
-            echo "ERROR: Background processing failed."
+            echo "ERROR: Background processing failed. Likely blocked (403 Forbidden)."
+            echo "Suggestion: Move the file to a direct host like Imgur/PostImage or provide Base64."
+            head -c 500 bg_raw.jpg
             exit 1
           fi
 

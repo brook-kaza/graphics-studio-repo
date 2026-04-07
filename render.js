@@ -4,14 +4,20 @@ const path = require('path');
 const { convertToGeezText, toEthiopianDateString } = require('./utils');
 
 function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
-    if (!fs.existsSync(imgPath) || modeStr === 'none') return '';
+    if (!fs.existsSync(imgPath)) return '';
+    
+    // If mode is none but file exists, treat it as a default frame-center to ensure it shows up
+    if (modeStr === 'none') {
+        modeStr = 'frame-center';
+    }
+
     let prefix = 'data:image/png;base64,';
     if (imgPath.endsWith('.jpg') || imgPath.endsWith('.jpeg')) prefix = 'data:image/jpeg;base64,';
     const b64Data = fs.readFileSync(imgPath).toString('base64');
     const src = prefix + b64Data;
 
     let cssClass = 'subject-element';
-    let baseStyles = `position:absolute; object-fit:contain; z-index:${baseZIndex}; transition: all 0.3s ease;`;
+    let baseStyles = `position:absolute; object-fit:contain; z-index:${baseZIndex}; transition: all 0.3s ease; image-rendering: -webkit-optimize-contrast;`;
     let positionStyles = ''; let filterStyles = ''; let scaleTransform = 'scaleX(1)';
     
     const isCutout = modeStr.includes('cutout');
@@ -24,16 +30,16 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
     if (isCenter) positionStyles = `bottom: 5%; left: 50%; transform: translateX(-50%); height: 80%;`;
 
     if (isCutout) {
-        filterStyles = `filter: drop-shadow(-15px 15px 35px rgba(0,0,0,0.85)); pointer-events:none;`;
+        filterStyles = `filter: drop-shadow(-15px 15px 35px rgba(0,0,0,0.85)) contrast(1.1) brightness(1.05); pointer-events:none;`;
         if (isLeft) scaleTransform = 'scaleX(1)';
         if (isRight) scaleTransform = 'scaleX(-1)';
         if ((isRight || isLeft) && !isCenter) positionStyles += ` transform: ${scaleTransform};`;
     } else {
         baseStyles += ` object-fit:cover; border: 15px solid white; border-radius: 10px; `;
-        filterStyles = `box-shadow: 0 40px 100px rgba(0,0,0,0.9);`;
+        filterStyles = `box-shadow: 0 40px 100px rgba(0,0,0,0.9); filter: contrast(1.1) brightness(1.05);`;
         if (isLeft)   positionStyles = `bottom: 15%; left: 8%; width: 25vw; height: auto; transform: rotate(-4deg);`;
         if (isRight)  positionStyles = `bottom: 15%; right: 8%; width: 25vw; height: auto; transform: rotate(4deg);`;
-        if (isCenter) positionStyles = `bottom: 15%; left: 50%; width: 30vw; height: auto; transform: translateX(-50%) rotate(2deg);`;
+        if (isCenter || modeStr === 'none') positionStyles = `bottom: 15%; left: 50%; width: 30vw; height: auto; transform: translateX(-50%) rotate(2deg);`;
     }
 
     const finalStyle = `${baseStyles} ${positionStyles} ${filterStyles}`;
@@ -90,7 +96,7 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
 
         console.log(`[ENGINE]: Background Image URL is: ${backgroundImageUrl}`);
 
-        const backgroundHtml = backgroundImageUrl ? `<img src="${backgroundImageUrl}" class="bg-layer" alt="Background">` : '';
+        const backgroundHtml = backgroundImageUrl ? `<img src="${backgroundImageUrl}" class="bg-layer" style="image-rendering: -webkit-optimize-contrast; filter: contrast(1.05) brightness(1.02) saturate(1.1); transform: scale(1.02);" alt="Background">` : '';
         const watermarkHtml = logoUrl ? `<img src="${logoUrl}" class="watermark" style="position:absolute; top:4%; left:50%; transform:translateX(-50%); z-index:50; height:12%; opacity:0.8; mix-blend-mode:screen; transition: all 0.5s ease;" alt="Watermark">` : '';
         const ecDate = toEthiopianDateString();
 
@@ -103,7 +109,8 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
             .replace('<!-- SUB_TITLE -->', subTitle)
             .replace('<!-- DETAILS -->', details)
             .replace('<!-- CALL_TO_ACTION -->', cta)
-            .replace('<!-- EC_DATE -->', ecDate);
+            .replace('<!-- EC_DATE -->', ecDate)
+            .replace('<head>', '<head><style>body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; image-rendering: -webkit-optimize-contrast; }</style>');
 
         const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
         const page = await browser.newPage();
@@ -115,8 +122,8 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
         if (aspectRatio === "4:5") { vWidth = 2160; vHeight = 2700; }
         else if (aspectRatio === "9:16") { vWidth = 2160; vHeight = 3840; }
 
-        await page.setViewport({ width: vWidth, height: vHeight, deviceScaleFactor: 1 });
-        await page.setContent(htmlContent, { waitUntil: ['networkidle0', 'load'] });
+        await page.setViewport({ width: vWidth, height: vHeight, deviceScaleFactor: 2 });
+        await page.setContent(htmlContent, { waitUntil: ['networkidle0', 'load', 'domcontentloaded'] });
         await page.evaluate(async () => await document.fonts.ready);
         
         // Execute Visionary Physics Physics Post-Load

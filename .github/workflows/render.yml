@@ -93,7 +93,7 @@ jobs:
           pip install "rembg[cpu,cli]" --break-system-packages
 
       - name: Process Subject 1
-        if: ${{ inputs.subject_1_url != '' && inputs.subject_1_mode != 'none' }}
+        if: ${{ inputs.subject_1_url != '' }}
         run: |
           S1_URL="${{ inputs.subject_1_url }}"
           S1_URL="${S1_URL%)}"
@@ -121,7 +121,7 @@ jobs:
           fi
 
       - name: Process Subject 2
-        if: ${{ inputs.subject_2_url != '' && inputs.subject_2_mode != 'none' }}
+        if: ${{ inputs.subject_2_url != '' }}
         run: |
           S2_URL="${{ inputs.subject_2_url }}"
           S2_URL="${S2_URL%)}"

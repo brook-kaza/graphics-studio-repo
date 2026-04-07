@@ -118,9 +118,9 @@ function buildSubjectHtml(imgPath, modeStr, baseZIndex) {
         // Forward page logs to terminal for debugging
         page.on('console', msg => console.log(`[BROWSER]: ${msg.text()}`));
 
-        let vWidth = 3840; let vHeight = 2160;
-        if (aspectRatio === "4:5") { vWidth = 2160; vHeight = 2700; }
-        else if (aspectRatio === "9:16") { vWidth = 2160; vHeight = 3840; }
+        let vWidth = 1920; let vHeight = 1080;
+        if (aspectRatio === "4:5") { vWidth = 1080; vHeight = 1350; }
+        else if (aspectRatio === "9:16") { vWidth = 1080; vHeight = 1920; }
 
         await page.setViewport({ width: vWidth, height: vHeight, deviceScaleFactor: 2 });
         await page.setContent(htmlContent, { waitUntil: ['networkidle0', 'load', 'domcontentloaded'] });

@@ -217,6 +217,6 @@ jobs:
             echo "4K too big, reducing to 2.5K..."
             convert output.png -filter Lanczos -quality 95 -resize '2560x2560>' output_tg.jpg
           fi
-          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
             -F chat_id="${TELEGRAM_CHAT_ID}" \
-            -F photo="@output_tg.jpg"
+            -F document="@output_tg.jpg"
